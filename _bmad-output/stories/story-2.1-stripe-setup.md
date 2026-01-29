@@ -8,7 +8,7 @@ story_points: 3
 sprint: "Sprint 2"
 created_at: "2026-01-29"
 updated_at: "2026-01-29T12:05:00"
-clickup_task_id: null
+clickup_task_id: "86ewdhhzy"
 ---
 
 # Story: Stripe SDK Setup and Configuration
