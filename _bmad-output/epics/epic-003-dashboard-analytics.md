@@ -5,7 +5,7 @@ status: "to-do"
 priority: "high"
 assigned_to: null
 created_at: "2026-01-29"
-updated_at: "2026-01-29"
+updated_at: "2026-01-29T12:15:00"
 clickup_task_id: null
 ---
 
