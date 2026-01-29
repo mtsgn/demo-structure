@@ -1,0 +1,165 @@
+name: Sync BMAD Artifacts to ClickUp
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_bmad-output/epics/**/*.md'
+      - '_bmad-output/stories/**/*.md'
+
+env:
+  # List IDs for different artifact types
+  CLICKUP_EPICS_LIST_ID: "901815396322"
+  CLICKUP_STORIES_LIST_ID: "901815396340"
+
+jobs:
+  sync-to-clickup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Changed Files
+        id: changed
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null | grep -E '_bmad-output/(epics|stories)/.*\.md$' || echo "")
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Changed files found: $CHANGED_FILES"
+
+      - name: Sync to ClickUp
+        if: steps.changed.outputs.files != ''
+        env:
+          CLICKUP_API_KEY: ${{ secrets.CLICKUP_API_KEY }}
+        run: |
+          echo "Starting ClickUp sync..."
+          
+          for file in ${{ steps.changed.outputs.files }}; do
+            echo ""
+            echo "========================================="
+            echo "Processing: $file"
+            echo "========================================="
+            
+            # Extract frontmatter using awk
+            FRONTMATTER=$(awk '/^---$/{p=!p;next}p' "$file" | head -30)
+            
+            # Parse YAML fields
+            ID=$(echo "$FRONTMATTER" | grep '^id:' | sed 's/id: *//; s/"//g' | tr -d ' ')
+            TITLE=$(echo "$FRONTMATTER" | grep '^title:' | sed 's/title: *//; s/"//g')
+            STATUS=$(echo "$FRONTMATTER" | grep '^status:' | sed 's/status: *//; s/"//g' | tr -d ' ')
+            CLICKUP_ID=$(echo "$FRONTMATTER" | grep '^clickup_task_id:' | sed 's/clickup_task_id: *//; s/"//g' | tr -d ' ')
+            EPIC_ID=$(echo "$FRONTMATTER" | grep '^epic_id:' | sed 's/epic_id: *//; s/"//g' | tr -d ' ')
+            
+            echo "  ID: $ID"
+            echo "  Title: $TITLE"
+            echo "  Status: $STATUS"
+            echo "  ClickUp ID: $CLICKUP_ID"
+            
+            # Determine task type and list
+            if [[ "$file" == *"/epics/"* ]]; then
+              TASK_TYPE="epic"
+              LIST_ID="${{ env.CLICKUP_EPICS_LIST_ID }}"
+              # Status mapping for Epics list
+              case "$STATUS" in
+                "to-do") CLICKUP_STATUS="to do" ;;
+                "in-progress") CLICKUP_STATUS="in progress" ;;
+                "done") CLICKUP_STATUS="complete" ;;
+                *) CLICKUP_STATUS="to do" ;;
+              esac
+            else
+              TASK_TYPE="story"
+              LIST_ID="${{ env.CLICKUP_STORIES_LIST_ID }}"
+              # Status mapping for Product Backlog list  
+              case "$STATUS" in
+                "to-do") CLICKUP_STATUS="Open" ;;
+                "scoping") CLICKUP_STATUS="scoping" ;;
+                "in-design") CLICKUP_STATUS="in design" ;;
+                "ready") CLICKUP_STATUS="ready for dev" ;;
+                "done") CLICKUP_STATUS="cancelled" ;;
+                *) CLICKUP_STATUS="Open" ;;
+              esac
+            fi
+            
+            echo "  Type: $TASK_TYPE"
+            echo "  List ID: $LIST_ID"
+            echo "  ClickUp Status: $CLICKUP_STATUS"
+            
+            # Get description (content after frontmatter)
+            DESCRIPTION=$(awk '/^---$/{if(++c==2)p=1;next}p' "$file" | head -100)
+            
+            # Prepare description with source info
+            FULL_DESC="**Auto-synced from BMAD workflow**\n\n"
+            if [ -n "$EPIC_ID" ]; then
+              FULL_DESC="${FULL_DESC}**Epic**: $EPIC_ID\n\n---\n\n"
+            fi
+            FULL_DESC="${FULL_DESC}${DESCRIPTION}\n\n---\n_Source: $file_"
+            
+            # Escape for JSON
+            DESCRIPTION_ESCAPED=$(echo -e "$FULL_DESC" | jq -Rs .)
+            TITLE_ESCAPED=$(echo "[$TASK_TYPE] $TITLE" | jq -Rs . | sed 's/^"//; s/"$//')
+            
+            if [ -z "$CLICKUP_ID" ] || [ "$CLICKUP_ID" = "null" ]; then
+              # CREATE new task
+              echo "  Creating new ClickUp task..."
+              
+              RESPONSE=$(curl -s -X POST \
+                "https://api.clickup.com/api/v2/list/$LIST_ID/task" \
+                -H "Authorization: $CLICKUP_API_KEY" \
+                -H "Content-Type: application/json" \
+                -d "{
+                  \"name\": \"[$TASK_TYPE] $TITLE\",
+                  \"description\": $DESCRIPTION_ESCAPED,
+                  \"status\": \"$CLICKUP_STATUS\",
+                  \"tags\": [\"bmad\", \"$TASK_TYPE\"]
+                }")
+              
+              NEW_ID=$(echo "$RESPONSE" | jq -r '.id')
+              NEW_URL=$(echo "$RESPONSE" | jq -r '.url')
+              
+              if [ "$NEW_ID" != "null" ] && [ -n "$NEW_ID" ]; then
+                echo "  ✅ Created ClickUp task: $NEW_ID"
+                echo "  URL: $NEW_URL"
+                
+                # Update markdown file with ClickUp ID
+                sed -i "s/clickup_task_id:.*/clickup_task_id: \"$NEW_ID\"/" "$file"
+              else
+                echo "  ❌ Error creating task:"
+                echo "$RESPONSE" | jq '.'
+              fi
+              
+            else
+              # UPDATE existing task
+              echo "  Updating existing ClickUp task: $CLICKUP_ID..."
+              
+              RESPONSE=$(curl -s -X PUT \
+                "https://api.clickup.com/api/v2/task/$CLICKUP_ID" \
+                -H "Authorization: $CLICKUP_API_KEY" \
+                -H "Content-Type: application/json" \
+                -d "{
+                  \"name\": \"[$TASK_TYPE] $TITLE\",
+                  \"description\": $DESCRIPTION_ESCAPED,
+                  \"status\": \"$CLICKUP_STATUS\"
+                }")
+              
+              echo "  ✅ Updated successfully"
+            fi
+            
+          done
+
+      - name: Commit Updated ClickUp IDs
+        if: steps.changed.outputs.files != ''
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add _bmad-output/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: Update ClickUp task IDs [skip ci]"
+            git push
+          fi
