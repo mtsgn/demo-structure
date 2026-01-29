@@ -12,7 +12,7 @@ due_date: "2026-02-05"
 time_estimate: 6
 created_at: "2026-01-29"
 updated_at: "2026-01-29T14:00:00"
-clickup_task_id: null
+clickup_task_id: "86ewdkwkc"
 ---
 
 # Story: Dashboard Data Export
