@@ -1,0 +1,35 @@
+name: Sync Docs to ClickUp Knowledge Base
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/team-processes/**/*.md'
+      - 'docs/tech-specs/**/*.md'
+
+env:
+  CLICKUP_WORKSPACE_ID: "90182277854"
+  CLICKUP_TEAM_PROCESSES_DOC_ID: "2kzmgppy-1378"
+  CLICKUP_TECH_SPECS_DOC_ID: "2kzmgppy-1218"
+
+permissions:
+  contents: write
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Sync Markdown Docs to ClickUp
+        run: bash .github/scripts/sync-docs.sh
+        env:
+          CLICKUP_API_KEY: ${{ secrets.CLICKUP_API_KEY }}
+          CLICKUP_WORKSPACE_ID: ${{ env.CLICKUP_WORKSPACE_ID }}
+          CLICKUP_TEAM_PROCESSES_DOC_ID: ${{ env.CLICKUP_TEAM_PROCESSES_DOC_ID }}
+          CLICKUP_TECH_SPECS_DOC_ID: ${{ env.CLICKUP_TECH_SPECS_DOC_ID }}
