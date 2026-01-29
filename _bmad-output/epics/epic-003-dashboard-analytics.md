@@ -6,7 +6,7 @@ priority: "high"
 assigned_to: null
 created_at: "2026-01-29"
 updated_at: "2026-01-29T12:15:00"
-clickup_task_id: null
+clickup_task_id: "86ewdhrby"
 ---
 
 # Epic: Dashboard Analytics & Reporting
