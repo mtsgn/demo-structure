@@ -66,7 +66,7 @@ jobs:
             else
               TYPE="story"
               LIST="$STORIES_LIST"
-              case "$STATUS" in to-do) CU_ST="Open";; scoping) CU_ST="scoping";; in-design) CU_ST="in design";; *) CU_ST="Open";; esac
+              case "$STATUS" in to-do) CU_ST="Open";; in-progress) CU_ST="ready for dev";; scoping) CU_ST="scoping";; in-design) CU_ST="in design";; done) CU_ST="cancelled";; *) CU_ST="Open";; esac
             fi
             
             # Get description using awk (content after 2nd ---)
