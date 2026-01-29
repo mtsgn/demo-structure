@@ -69,14 +69,30 @@ jobs:
               case "$STATUS" in to-do) CU_ST="Open";; scoping) CU_ST="scoping";; in-design) CU_ST="in design";; *) CU_ST="Open";; esac
             fi
             
-            # Get description
-            DESC=$(sed '1,/^---$/d' "$file" | sed '1,/^---$/d' | head -50)
-            [ -n "$EPIC" ] && DESC="**Epic**: $EPIC\n\n$DESC"
-            DESC="$DESC\n\n---\n_Source: $file_"
             
-            # Build JSON
+            # Get description using awk (content after 2nd ---)
+            DESC=$(awk 'BEGIN{c=0} /^---$/{c++;next} c>=2{print}' "$file" | head -50)
+            
+            # Build full description with metadata
+            if [ -n "$EPIC" ]; then
+              FULL_DESC="**Epic**: ${EPIC}
+
+---
+
+${DESC}
+
+---
+_Source: ${file}_"
+            else
+              FULL_DESC="${DESC}
+
+---
+_Source: ${file}_"
+            fi
+            
+            # Build JSON (jq handles multiline strings properly)
             NAME="[$TYPE] $TITLE"
-            JSON=$(jq -n --arg n "$NAME" --arg d "$DESC" --arg s "$CU_ST" --arg t "$TYPE" \
+            JSON=$(jq -n --arg n "$NAME" --arg d "$FULL_DESC" --arg s "$CU_ST" --arg t "$TYPE" \
               '{name:$n, description:$d, status:$s, tags:["bmad",$t]}')
             
             if [ -z "$CU_ID" ]; then
