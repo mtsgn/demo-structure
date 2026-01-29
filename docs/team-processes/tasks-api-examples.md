@@ -1,8 +1,8 @@
 ---
 clickup_workspace_id: "90182277854"
 clickup_doc_id: "2kzmgppy-1378"
-clickup_page_id: "2kzmgppy-1958"
-parent_page_id: "2kzmgppy-1938"
+clickup_page_id: null
+parent_page_id: null
 title: "Tasks API Examples"
 ---
 
