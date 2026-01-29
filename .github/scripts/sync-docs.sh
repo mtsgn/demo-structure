@@ -3,6 +3,7 @@ set -e
 
 # ============================================
 # Sync Markdown Docs to ClickUp Docs/Pages
+# Enhanced: Standalone Docs + Nested Pages
 # ============================================
 
 WORKSPACE_ID="${CLICKUP_WORKSPACE_ID}"
@@ -15,9 +16,23 @@ if [ -z "$API_KEY" ]; then
   exit 1
 fi
 
-# Get all markdown files in docs/ (simpler approach - sync all files on every run)
+# Get all markdown files to sync
 echo "📂 Searching for docs to sync..."
-CHANGED_FILES=$(find docs/team-processes docs/tech-specs -name '*.md' -type f 2>/dev/null || true)
+CHANGED_FILES=""
+
+# Include README.md if it exists
+if [ -f "README.md" ]; then
+  CHANGED_FILES="README.md"
+fi
+
+# Add docs from team-processes and tech-specs
+DOCS_FILES=$(find docs/team-processes docs/tech-specs -name '*.md' -type f 2>/dev/null || true)
+if [ -n "$DOCS_FILES" ]; then
+  CHANGED_FILES="$CHANGED_FILES $DOCS_FILES"
+fi
+
+# Trim leading/trailing whitespace
+CHANGED_FILES=$(echo "$CHANGED_FILES" | xargs)
 
 if [ -z "$CHANGED_FILES" ]; then
   echo "✅ No docs found"
@@ -31,7 +46,6 @@ echo "$CHANGED_FILES"
 get_frontmatter_value() {
   local file=$1
   local key=$2
-  # Simple grep + sed extraction (assumes YAML frontmatter)
   sed -n '/^---$/,/^---$/p' "$file" | grep "^$key:" | sed "s/^$key: *//; s/\"//g; s/'//g" || echo ""
 }
 
@@ -40,8 +54,6 @@ update_frontmatter_value() {
   local file=$1
   local key=$2
   local value=$3
-  
-  # Use sed to update the value in frontmatter
   sed -i.bak "s/^$key:.*/$key: \"$value\"/" "$file"
   rm -f "${file}.bak"
 }
@@ -49,27 +61,105 @@ update_frontmatter_value() {
 # Function to get markdown content (excluding frontmatter)
 get_markdown_content() {
   local file=$1
-  # Skip frontmatter, return rest
   sed '/^---$/,/^---$/d' "$file"
 }
 
-# Function to get page title from filename or frontmatter
-get_page_title() {
+# Function to get title from filename or frontmatter
+get_title() {
   local file=$1
   local title=$(get_frontmatter_value "$file" "title")
   
   if [ -z "$title" ]; then
-    # Use filename without extension
     basename "$file" .md | sed 's/-/ /g; s/\b\(.\)/\u\1/g'
   else
     echo "$title"
   fi
 }
 
-# Process each changed file
+# ===========================================
+# MAIN PROCESSING LOOP
+# ===========================================
 for FILE in $CHANGED_FILES; do
   echo ""
   echo "=== Processing: $FILE ==="
+  
+  # Extract metadata
+  DOC_TYPE=$(get_frontmatter_value "$FILE" "type")
+  TITLE=$(get_title "$FILE")
+  CONTENT=$(get_markdown_content "$FILE")
+  
+  echo "📝 Title: $TITLE"
+  
+  # =========================================
+  # STANDALONE DOC (type: "doc")
+  # =========================================
+  if [ "$DOC_TYPE" == "doc" ]; then
+    echo "📚 Type: Standalone Doc"
+    
+    DOC_ID=$(get_frontmatter_value "$FILE" "clickup_doc_id")
+    
+    # Prepare JSON payload for Doc
+    JSON_PAYLOAD=$(jq -n \
+      --arg name "$TITLE" \
+      --arg content "$CONTENT" \
+      '{
+        name: $name,
+        content: $content,
+        content_format: "text/md"
+      }')
+    
+    if [ -z "$DOC_ID" ] || [ "$DOC_ID" == "null" ]; then
+      # CREATE new standalone Doc
+      echo "➕ Creating new standalone Doc..."
+      
+      RESPONSE=$(curl -s -X POST \
+        "https://api.clickup.com/api/v3/workspaces/$WORKSPACE_ID/docs" \
+        -H "Authorization: $API_KEY" \
+        -H "Content-Type: application/json" \
+        -d "$JSON_PAYLOAD")
+      
+      NEW_DOC_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
+      
+      if [ -z "$NEW_DOC_ID" ]; then
+        echo "❌ Failed to create Doc"
+        echo "Response: $RESPONSE"
+        exit 1
+      fi
+      
+      echo "✅ Created Doc: $NEW_DOC_ID"
+      
+      # Write back to frontmatter
+      update_frontmatter_value "$FILE" "clickup_doc_id" "$NEW_DOC_ID"
+      echo "📌 Updated frontmatter with doc_id"
+      
+    else
+      # UPDATE existing Doc
+      echo "♻️  Updating Doc: $DOC_ID..."
+      
+      JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | jq '. + {content_edit_mode: "replace"}')
+      
+      RESPONSE=$(curl -s -X PUT \
+        "https://api.clickup.com/api/v3/workspaces/$WORKSPACE_ID/docs/$DOC_ID" \
+        -H "Authorization: $API_KEY" \
+        -H "Content-Type: application/json" \
+        -d "$JSON_PAYLOAD")
+      
+      ERROR=$(echo "$RESPONSE" | jq -r '.err // empty')
+      if [ -n "$ERROR" ]; then
+        echo "❌ Failed to update Doc"
+        echo "Error: $ERROR"
+        exit 1
+      fi
+      
+      echo "✅ Updated Doc successfully"
+    fi
+    
+    continue
+  fi
+  
+  # =========================================
+  # REGULAR PAGE (default)
+  # =========================================
   
   # Determine parent doc ID based on path
   if [[ "$FILE" == docs/team-processes/* ]]; then
@@ -83,22 +173,25 @@ for FILE in $CHANGED_FILES; do
     continue
   fi
   
-  # Extract metadata
+  # Extract page metadata
   PAGE_ID=$(get_frontmatter_value "$FILE" "clickup_page_id")
-  PAGE_TITLE=$(get_page_title "$FILE")
-  CONTENT=$(get_markdown_content "$FILE")
+  PARENT_PAGE_ID=$(get_frontmatter_value "$FILE" "parent_page_id")
   
-  echo "📝 Title: $PAGE_TITLE"
-  
-  # Prepare JSON payload
+  # Prepare JSON payload for Page
   JSON_PAYLOAD=$(jq -n \
-    --arg title "$PAGE_TITLE" \
+    --arg title "$TITLE" \
     --arg content "$CONTENT" \
     '{
       name: $title,
       content: $content,
       content_format: "text/md"
     }')
+  
+  # Add parent_page_id if specified (for nested pages)
+  if [ -n "$PARENT_PAGE_ID" ] && [ "$PARENT_PAGE_ID" != "null" ]; then
+    echo "📎 Parent Page: $PARENT_PAGE_ID"
+    JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | jq --arg parent "$PARENT_PAGE_ID" '. + {parent_page_id: $parent}')
+  fi
   
   if [ -z "$PAGE_ID" ] || [ "$PAGE_ID" == "null" ]; then
     # CREATE new page
@@ -110,7 +203,6 @@ for FILE in $CHANGED_FILES; do
       -H "Content-Type: application/json" \
       -d "$JSON_PAYLOAD")
     
-    # Extract page ID from response
     NEW_PAGE_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
     
     if [ -z "$NEW_PAGE_ID" ]; then
@@ -126,10 +218,9 @@ for FILE in $CHANGED_FILES; do
     echo "📌 Updated frontmatter with page_id"
     
   else
-   # UPDATE existing page
+    # UPDATE existing page
     echo "♻️  Updating page: $PAGE_ID..."
     
-    # Add content_edit_mode for updates
     JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | jq '. + {content_edit_mode: "replace"}')
     
     RESPONSE=$(curl -s -X PUT \
@@ -138,7 +229,6 @@ for FILE in $CHANGED_FILES; do
       -H "Content-Type: application/json" \
       -d "$JSON_PAYLOAD")
     
-    # Check for errors
     ERROR=$(echo "$RESPONSE" | jq -r '.err // empty')
     if [ -n "$ERROR" ]; then
       echo "❌ Failed to update page"
@@ -153,15 +243,15 @@ done
 echo ""
 echo "🎉 All docs synced to ClickUp!"
 
-# Commit frontmatter changes (page IDs) back to repo
+# Commit frontmatter changes back to repo
 if git diff --quiet; then
   echo "✅ No frontmatter changes to commit"
 else
-  echo "📝 Committing page ID updates..."
+  echo "📝 Committing ID updates..."
   git config user.name "GitHub Actions Bot"
   git config user.email "actions@github.com"
-  git add docs/
-  git commit -m "chore: Update ClickUp page IDs [skip ci]"
+  git add README.md docs/ 2>/dev/null || git add docs/
+  git commit -m "chore: Update ClickUp doc/page IDs [skip ci]"
   git push
   echo "✅ Pushed frontmatter updates"
 fi

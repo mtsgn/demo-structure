@@ -1,3 +1,10 @@
+---
+clickup_workspace_id: "90182277854"
+clickup_doc_id: null
+type: "doc"
+title: "RMN Platform Overview"
+---
+
 # RMN Platform - Project Overview
 
 > **Modern Platform Development with AI-Powered Workflows**
