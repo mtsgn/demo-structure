@@ -7,7 +7,7 @@ assigned_to: "eric@devcrane.com"
 tags: ["epic", "auth"]
 start_date: "2026-01-30"
 due_date: "2026-02-28"
-clickup_task_id: null
+clickup_task_id: "86ewdmdje"
 ---
 
 # User Profile Management

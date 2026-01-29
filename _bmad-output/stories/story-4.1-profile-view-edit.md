@@ -11,7 +11,7 @@ sprint: "Sprint 2"
 start_date: "2026-02-01"
 due_date: "2026-02-10"
 time_estimate: 16
-clickup_task_id: null
+clickup_task_id: "86ewdmdjr"
 ---
 
 # Profile View & Edit
