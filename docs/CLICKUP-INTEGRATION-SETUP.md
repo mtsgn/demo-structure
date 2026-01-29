@@ -1,229 +1,171 @@
 # ClickUp Rules & Integration Configuration
 
-> **Đọc kỹ trước khi làm việc với ClickUp!**  
-> Tài liệu này mô tả cấu trúc workspace, statuses, và cách sync từ GitHub.
+> **Đọc kỹ trước khi làm việc với ClickUp!**
 
 ---
 
 ## 1. Cấu Trúc Workspace
 
-### Space: Development Team
-**ID**: `90189438827`
-
-### Folders
+### Space: Development Team (`90189438827`)
 
 | Folder | ID | Mục đích |
 |--------|-----|----------|
-| **Planning & Backlog** | `901811729589` | Quản lý Epics, Product Backlog, Bug Triage |
-| **Sprint** | `901811698066` | Sprint hiện tại và kế tiếp |
-| **Knowledge Base** | `901811729668` | Tài liệu, Tech Specs |
+| **Planning & Backlog** | `901811729589` | Epics, Product Backlog, Bug Triage |
+| **Sprint** | `901811698066` | Sprint Lists |
+| **Knowledge Base** | `901811729668` | Tài liệu |
 
 ---
 
 ## 2. Lists & Statuses
 
-### 📋 Epics / Initiatives
-**ID**: `901815396322`  
-**Sync từ**: `_bmad-output/epics/*.md`
+### Epics / Initiatives (`901815396322`)
 
-| Order | Status | Type | Markdown Value |
-|-------|--------|------|----------------|
-| 0 | `to do` | open | `to-do` |
-| 1 | `in progress` | custom | `in-progress` |
-| 2 | `complete` | done | `done` |
-| 3 | `cancelled` | closed | `cancelled` |
+| Status | Markdown Value |
+|--------|----------------|
+| `to do` | `to-do` |
+| `in progress` | `in-progress` |
+| `complete` | `done` |
+| `cancelled` | `cancelled` |
 
-**Rule**: Epics không bao giờ di chuyển vào Sprint. Chúng chỉ là container cho User Stories.
+### Product Backlog (`901815396340`)
 
----
+| Status | Markdown Value |
+|--------|----------------|
+| `Open` | `to-do` |
+| `scoping` | `scoping` |
+| `in design` | `in-design` |
+| `ready for dev` | `ready-for-dev` / `in-progress` |
+| `cancelled` | `cancelled` |
 
-### 📝 Product Backlog
-**ID**: `901815396340`  
-**Sync từ**: `_bmad-output/stories/*.md`
+### Bug Triage (`901815396345`)
 
-| Order | Status | Type | Markdown Value |
-|-------|--------|------|----------------|
-| 0 | `Open` | open | `to-do` |
-| 1 | `scoping` | custom | `scoping` |
-| 2 | `in design` | custom | `in-design` |
-| 3 | `ready for dev` | custom | `ready-for-dev` |
-| 4 | `cancelled` | closed | `cancelled` |
+| Status | Markdown Value |
+|--------|----------------|
+| `new` | `new` |
+| `checking` | `checking` |
+| `fixing` | `fixing` |
+| `verified` | `verified` |
+| `won't fix` | `wont-fix` |
 
-**Rule**: Chỉ tasks có status `ready for dev` (đã có Spec, Design, Estimate) mới được move vào Sprint.
+### Sprint Lists
 
----
-
-### 🐛 Bug Triage
-**ID**: `901815396345`  
-**Sync từ**: `_bmad-output/bugs/*.md` *(chưa implement)*
-
-| Order | Status | Type | Markdown Value |
-|-------|--------|------|----------------|
-| 0 | `new` | open | `new` |
-| 1 | `checking` | custom | `checking` |
-| 2 | `fixing` | custom | `fixing` |
-| 3 | `verified` | done | `verified` |
-| 4 | `won't fix` | closed | `wont-fix` |
-
-**Rule**: PM review weekly để quyết định Hotfix ngay hay đưa vào Backlog.
+| Status | Markdown Value |
+|--------|----------------|
+| `to do` | `to-do` |
+| `in development` | `in-development` |
+| `in review` | `in-review` |
+| `testing` | `testing` |
+| `shipped` | `shipped` |
+| `cancelled` | `cancelled` |
 
 ---
 
-### 🏃 Sprint Lists
-**Sprint 1 ID**: `901815360889` (1/26 - 2/8)  
-**Sprint 2 ID**: `901815360910` (2/9 - 2/22)
+## 3. Tags (CHỈ DÙNG TAGS CÓ SẴN)
 
-| Order | Status | Type | Markdown Value |
-|-------|--------|------|----------------|
-| 0 | `to do` | open | `to-do` |
-| 1 | `in development` | custom | `in-development` |
-| 2 | `in review` | custom | `in-review` |
-| 3 | `testing` | custom | `testing` |
-| 4 | `shipped` | done | `shipped` |
-| 5 | `cancelled` | closed | `cancelled` |
+### Technical Domain
+`frontend` `backend` `mobile` `devops` `database`
 
-**Rule**: User Stories chỉ chuyển sang `shipped` khi tất cả subtasks hoàn thành. Real-time update bắt buộc.
+### Functional Module
+`auth` `payment` `reporting` `notification` `settings` `integration`
 
----
+### Maintenance
+`hotfix` `bug-prod` `bug-staging` `tech-debt` `refactor` `performance` `security` `accessibility`
 
-## 3. Task Standards
+### Special
+`bmad` `epic` `story` `design` `customer-report`
 
-### Time Estimate
-- **Bắt buộc** trước khi bắt đầu
-- Đơn vị: Hours
-- Maximum: 8h/task (nếu lớn hơn → tách subtasks)
-
-### Time Tracking
-- Sử dụng **Play/Stop** để tracking
-- Mục đích: calibration, không phải policing
-
-### Dates
-- `Start Date` và `Due Date` **bắt buộc**
-- Để tính toán workload chính xác
-
-### Priority
-
-| Priority | Ý nghĩa |
-|----------|---------|
-| `Urgent` | Immediate action |
-| `High` | Core Sprint features |
-| `Normal` | Default |
-| `Low` | Nice to have |
-
-### Tags (kebab-case)
-
-**Technical Domain**: `frontend`, `backend`, `mobile`, `devops`  
-**Functional Modules**: `auth`, `payment`, `dashboard`, `user`  
-**Maintenance**: `tech-debt`, `refactor`, `hotfix`
+> ⚠️ **KHÔNG tự tạo tags mới.** Workflow sẽ chỉ sử dụng tags từ frontmatter.
 
 ---
 
-## 4. GitHub Integration
+## 4. Templates
 
-### Workflow File
-`.github/workflows/sync-clickup.yml`
+### Story Template
+Đường dẫn: `_bmad-output/templates/story-template.md`
 
-### Required Secret
-**Name**: `CLICKUP_API_KEY`  
-**Value**: `pk_xxx...` (ClickUp API token)
-
-### Cách hoạt động
-
-```
-Developer tạo/sửa file trong _bmad-output/
-        ↓
-git push to main
-        ↓
-GitHub Action triggers
-        ↓
-Workflow parse frontmatter
-        ↓
-IF clickup_task_id == null:
-   → CREATE task mới
-   → Commit ID về repo
-ELSE:
-   → UPDATE task hiện có
-```
-
-### Frontmatter Format
-
-**Epic**:
 ```yaml
 ---
-id: "EPIC-001"
-title: "User Authentication"
+id: "STORY-X.X"
+epic_id: "EPIC-XXX"
+title: ""
 status: "to-do"
+priority: "normal"
+assigned_to: null
+tags: ["backend", "auth"]   # Chỉ tags có sẵn
+story_points: null
+sprint: null
+start_date: "2026-01-30"
+due_date: "2026-02-05"
+time_estimate: 6            # hours
 clickup_task_id: null
 ---
 ```
 
-**Story**:
-```yaml
----
-id: "STORY-1.1"
-epic_id: "EPIC-001"
-title: "Login Page"
-status: "to-do"
-assigned_to: "email@example.com"  # or ["email1", "email2"] for multiple
-clickup_task_id: null
----
-```
+### Epic Template
+Đường dẫn: `_bmad-output/templates/epic-template.md`
 
 ---
 
-## 6. Assignee Support
+## 5. PM Workflow
 
-### Email-to-ClickUp-ID Mapping
+### Gán Task (Natural Language)
 
-Workflow tự động map email sang ClickUp User ID. Cấu hình trong workflow file:
+PM nói:
+> "Gán STORY-3.5 cho minh@company.com, deadline 5/2, priority high, tags backend database"
 
-```yaml
-EMAIL_TO_CLICKUP_ID: "email1:clickup_id1,email2:clickup_id2"
-```
+AI sẽ:
+1. Update frontmatter
+2. Push → sync to ClickUp
+3. Reply: "Đã gán STORY-3.5"
 
-**Hiện tại đã config:**
+### Review Tiến Độ
 
-| Email | ClickUp User ID |
-|-------|-----------------|
+PM nói:
+> "Tổng hợp tiến độ sprint hiện tại"
+
+AI sẽ scan `_bmad-output/stories/` và generate report.
+
+---
+
+## 6. Dev Workflow
+
+### Update Task (Natural Language)
+
+Dev nói:
+> "Update STORY-3.5: Đã xong API endpoint, đang test. Status in-progress"
+
+AI sẽ:
+1. Update `status: "in-progress"`
+2. Append vào `## Updates` section:
+   ```
+   **2026-01-29 14:00** - @dev: Đã xong API endpoint, đang test.
+   ```
+3. Push → sync
+
+### Xem Task
+
+Dev nói:
+> "Cho tôi xem các task được gán cho tôi"
+
+AI sẽ filter stories by `assigned_to`.
+
+---
+
+## 7. Assignee Mapping
+
+| Email | ClickUp ID |
+|-------|------------|
 | `work.huutrung@gmail.com` | `300697285` |
 | `mazhnguyen@kwayvina.com` | `300697285` |
 
-### Auto-Assign (Git Commit Author)
-
-Nếu `assigned_to` trống → tự động gán cho người commit:
-- Git commit author email → ClickUp User ID → Assignee
-
-### Manual Assign (Frontmatter)
-
-**Single assignee:**
-```yaml
-assigned_to: "work.huutrung@gmail.com"
-```
-
-**Multiple assignees** (khi một người nghỉ, người khác làm giúp):
-```yaml
-assigned_to: ["email1@example.com", "email2@example.com"]
-```
-
-### Thêm Team Member Mới
-
-1. Lấy ClickUp User ID từ API:
-   ```bash
-   curl -H "Authorization: pk_xxx" "https://api.clickup.com/api/v2/team" | jq '.teams[0].members'
-   ```
-
-2. Thêm vào `EMAIL_TO_CLICKUP_ID` trong `.github/workflows/sync-clickup.yml`:
-   ```yaml
-   EMAIL_TO_CLICKUP_ID: "existing_mapping,new_email:new_id"
-   ```
+Thêm member: Cập nhật `EMAIL_TO_CLICKUP_ID` trong workflow.
 
 ---
 
-## 7. Admin Links
+## 8. Admin Links
 
-- **GitHub Actions**: https://github.com/hutune/demo-structure/actions
-- **ClickUp Space**: https://app.clickup.com/90182277854/v/s/90189438827
-- **Epics List**: https://app.clickup.com/90182277854/v/li/901815396322
-- **Product Backlog**: https://app.clickup.com/90182277854/v/li/901815396340
-- **Bug Triage**: https://app.clickup.com/90182277854/v/li/901815396345
-- **ClickUp Rules Doc**: https://app.clickup.com/90182277854/v/dc/2kzmgppy-1258/2kzmgppy-1278
+- [GitHub Actions](https://github.com/hutune/demo-structure/actions)
+- [ClickUp Space](https://app.clickup.com/90182277854/v/s/90189438827)
+- [Epics List](https://app.clickup.com/90182277854/v/li/901815396322)
+- [Product Backlog](https://app.clickup.com/90182277854/v/li/901815396340)
+- [ClickUp Rules Doc](https://app.clickup.com/90182277854/v/dc/2kzmgppy-1258/2kzmgppy-1278)

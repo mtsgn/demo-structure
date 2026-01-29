@@ -97,8 +97,9 @@ jobs:
             START_DATE=$(get_field start_date)
             DUE_DATE=$(get_field due_date)
             TIME_EST=$(get_field time_estimate)
+            TAGS_RAW=$(get_field tags)
             
-            echo "  $ID: $TITLE | Status=$STATUS | Priority=$PRIORITY"
+            echo "  $ID: $TITLE | Status=$STATUS | Priority=$PRIORITY | Tags=$TAGS_RAW"
             
             # Build assignees
             ASSIGNEES="[]"
@@ -134,10 +135,19 @@ jobs:
               FULL_DESC=$(printf "%s\n\n---\n_Source: %s_" "$DESC" "$file")
             fi
             
+            # Build tags array from frontmatter (use existing tags only, no auto-create)
+            TAGS_JSON="[]"
+            if [ -n "$TAGS_RAW" ]; then
+              CLEAN_TAGS=$(echo "$TAGS_RAW" | tr -d '[]"' | tr ',' '\n' | xargs)
+              if [ -n "$CLEAN_TAGS" ]; then
+                TAGS_JSON=$(echo "$CLEAN_TAGS" | tr ' ' '\n' | jq -R -s -c 'split("\n") | map(select(length > 0))')
+              fi
+            fi
+            
             # Build payload
             NAME="[$TYPE] $TITLE"
-            PAYLOAD=$(jq -n --arg n "$NAME" --arg d "$FULL_DESC" --arg s "$CU_ST" --arg t "$TYPE" --argjson a "$ASSIGNEES" \
-              '{name:$n, description:$d, status:$s, tags:["bmad",$t], assignees:$a}')
+            PAYLOAD=$(jq -n --arg n "$NAME" --arg d "$FULL_DESC" --arg s "$CU_ST" --argjson a "$ASSIGNEES" --argjson t "$TAGS_JSON" \
+              '{name:$n, description:$d, status:$s, tags:$t, assignees:$a}')
             
             # Optional fields
             PRI=$(priority_map "$PRIORITY")
