@@ -8,7 +8,7 @@ story_points: 8
 sprint: "Sprint 1"
 created_at: "2026-01-29"
 updated_at: "2026-01-29"
-clickup_task_id: "86ewdgy7d"
+clickup_task_id: null
 ---
 
 # Story: Implement User Registration
