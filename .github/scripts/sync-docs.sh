@@ -16,7 +16,14 @@ if [ -z "$API_KEY" ]; then
 fi
 
 # Get changed markdown files in docs/
-CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- 'docs/team-processes/**/*.md' 'docs/tech-specs/**/*.md' || true)
+# In GitHub Actions, use git diff with proper refs
+if [ -n "$GITHUB_EVENT_BEFORE" ] && [ "$GITHUB_EVENT_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+  # Use before/after commits from GitHub event
+  CHANGED_FILES=$(git diff --name-only $GITHUB_EVENT_BEFORE $GITHUB_SHA -- 'docs/team-processes/**/*.md' 'docs/tech-specs/**/*.md' 2>/dev/null || true)
+else
+  # Fallback: compare with previous commit
+  CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD -- 'docs/team-processes/**/*.md' 'docs/tech-specs/**/*.md' 2>/dev/null || true)
+fi
 
 if [ -z "$CHANGED_FILES" ]; then
   echo "✅ No docs changed"
