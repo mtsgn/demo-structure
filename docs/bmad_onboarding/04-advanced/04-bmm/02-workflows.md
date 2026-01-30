@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "BMM Workflows Reference"
+---
+
 # BMM Workflows - Complete Reference
 
 > **Module**: BMM (BMAD Method Module)  

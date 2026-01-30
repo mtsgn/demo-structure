@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "BMAD Directory Deep Dive"
+---
+
 # `_bmad/` Directory - Deep Dive
 
 > **Advanced documentation** về internal structure của BMAD framework  

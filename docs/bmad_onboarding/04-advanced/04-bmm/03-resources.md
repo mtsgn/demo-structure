@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "BMM Supporting Resources"
+---
+
 # BMM Supporting Resources
 
 > **Module**: BMM (BMAD Method Module)  

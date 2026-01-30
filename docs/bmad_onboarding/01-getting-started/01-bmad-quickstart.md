@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "BMAD Quickstart Guide"
+---
+
 # BMAD Method - Quick Start Guide
 
 > **5-10 phút** để hiểu và bắt đầu với BMAD Method

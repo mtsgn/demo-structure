@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "Manifest Hub Deep Dive"
+---
+
 # `_bmad/_config/` - Manifest Hub Deep Dive
 
 > **Deep technical documentation** về BMAD's configuration và discovery system  

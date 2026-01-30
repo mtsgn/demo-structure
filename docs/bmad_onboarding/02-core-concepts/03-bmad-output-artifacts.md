@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "Output Artifacts Guide"
+---
+
 # Tài Liệu Chi Tiết: `_bmad-output/` Folder
 
 ## 📋 Tổng Quan

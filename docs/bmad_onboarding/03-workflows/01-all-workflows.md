@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "All Workflows Reference"
+---
+
 # Tài Liệu Chi Tiết: `.agent/workflows/` Directory
 
 ## 📋 Tổng Quan

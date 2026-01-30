@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "Core Module Reference"
+---
+
 # Core Module - Complete Reference
 
 > **Module**: Core (Universal BMAD Tools)  

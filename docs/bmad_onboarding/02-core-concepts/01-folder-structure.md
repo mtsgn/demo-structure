@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "Folder Structure Guide"
+---
+
 # Hướng Dẫn Cấu Trúc BMAD Method
 
 ## 📁 Tổng Quan Cấu Trúc Folder

@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "BMM Agents Overview"
+---
+
 # BMM Agents - Complete Overview
 
 > **Module**: BMM (BMAD Method Module)  

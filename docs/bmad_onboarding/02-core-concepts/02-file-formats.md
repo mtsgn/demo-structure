@@ -1,3 +1,9 @@
+---
+clickup_workspace_id: "90182277854"
+type: "page"
+title: "File Formats Explained"
+---
+
 # Giải Thích Các File Format Trong BMAD Method
 
 ## 🎯 Câu Hỏi 1: Tại Sao Có Nhiều Định Dạng File Khác Nhau?

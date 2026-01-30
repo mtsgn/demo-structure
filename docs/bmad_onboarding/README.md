@@ -1,3 +1,10 @@
+---
+clickup_workspace_id: "90182277854"
+clickup_folder_id: "2kzmgppy-1737"
+type: "doc"
+title: "BMAD Onboarding"
+---
+
 # BMAD Method - Tài Liệu Hướng Dẫn
 
 > **Tài liệu học tập về BMAD Method** - Framework phát triển phần mềm theo phương pháp Agile AI-Driven Development
