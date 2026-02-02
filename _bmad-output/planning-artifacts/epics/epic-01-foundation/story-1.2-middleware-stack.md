@@ -2,9 +2,9 @@
 id: "STORY-1.2"
 epic_id: "EPIC-001"
 title: "Middleware Stack Implementation"
-status: "done"
+status: "doing"
 priority: "critical"
-assigned_to: null
+assigned_to: "Leo <leonkenzo1997@gmail.com>"
 tags: ["backend", "middleware", "cors", "logging", "rate-limit"]
 story_points: 5
 sprint: 1

@@ -2,9 +2,9 @@
 id: "STORY-1.4"
 epic_id: "EPIC-001"
 title: "Role-Based Authorization Middleware"
-status: "done"
+status: "doing"
 priority: "critical"
-assigned_to: null
+assigned_to: "Leo <leonkenzo1997@gmail.com>"
 tags: ["backend", "auth", "rbac", "middleware"]
 story_points: 3
 sprint: 1

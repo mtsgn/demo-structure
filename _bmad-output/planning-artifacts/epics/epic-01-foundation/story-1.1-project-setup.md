@@ -2,7 +2,7 @@
 id: "STORY-1.1"
 epic_id: "EPIC-001"
 title: "Project Setup & API Gateway Foundation"
-status: "done"
+status: "doing"
 priority: "critical"
 assigned_to: "Leo <leonkenzo1997@gmail.com>"
 tags: ["backend", "gateway", "setup"]

@@ -596,7 +596,6 @@ services:
 ---
 
 ## 13. Appendix
-
 ### 13.1 Coding Standards (từ .cursor/rules)
 
 - **biz_rule.mdc** - Business logic rules

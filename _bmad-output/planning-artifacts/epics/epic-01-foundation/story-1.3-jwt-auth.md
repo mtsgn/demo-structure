@@ -2,9 +2,9 @@
 id: "STORY-1.3"
 epic_id: "EPIC-001"
 title: "JWT Authentication Service"
-status: "done"
+status: "doing"
 priority: "critical"
-assigned_to: null
+assigned_to: "Leo <leonkenzo1997@gmail.com>"
 tags: ["backend", "auth", "jwt", "security"]
 story_points: 8
 sprint: 1
