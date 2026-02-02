@@ -1,7 +1,7 @@
 ---
 id: "EPIC-001"
 title: "Project Foundation & Authentication"
-status: "to-do"
+status: "done"
 priority: "critical"
 assigned_to: null
 tags: ["epic", "backend", "foundation", "auth"]

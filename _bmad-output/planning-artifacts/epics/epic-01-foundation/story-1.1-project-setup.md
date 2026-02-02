@@ -2,14 +2,14 @@
 id: "STORY-1.1"
 epic_id: "EPIC-001"
 title: "Project Setup & API Gateway Foundation"
-status: "to-do"
+status: "done"
 priority: "critical"
 assigned_to: "Leo <leonkenzo1997@gmail.com>"
 tags: ["backend", "gateway", "setup"]
 story_points: 5
-sprint: null
-start_date: null
-due_date: null
+sprint: 1
+start_date: "2026-01-15"
+due_date: "2026-01-17"
 time_estimate: "2d"
 clickup_task_id: null
 ---
@@ -24,11 +24,19 @@ clickup_task_id: null
 
 ## Acceptance Criteria
 
-- [ ] Project structure được tạo với các thư mục: `cmd/`, `internal/`, `config/`, `pkg/`
-- [ ] API Gateway chạy trên port 8080
-- [ ] Health check endpoint `/health` trả về status 200
-- [ ] Config được load từ `config/config.yaml` bằng Viper
-- [ ] Graceful shutdown được implement
+- [x] Project structure được tạo với các thư mục: `cmd/`, `internal/`, `config/`, `pkg/`
+- [x] API Gateway chạy trên port 8080
+- [x] Health check endpoint `/health` trả về status 200
+- [x] Config được load từ `config/config.yaml` bằng Viper
+- [x] Graceful shutdown được implement
+
+## Implementation Notes
+
+> **✅ DONE** - Đã implement trong các services hiện có:
+> - `mtsgn-source-base-svc/` - Base template với full project structure
+> - `mtsgn-system-gateway-svc/` - API Gateway implementation
+> - Config loading: `pkg/config/config.go` sử dụng Viper
+> - Server: `internal/app/server.go` với graceful shutdown
 
 ## Technical Notes
 

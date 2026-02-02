@@ -2,14 +2,14 @@
 id: "STORY-1.2"
 epic_id: "EPIC-001"
 title: "Middleware Stack Implementation"
-status: "to-do"
+status: "done"
 priority: "critical"
 assigned_to: null
 tags: ["backend", "middleware", "cors", "logging", "rate-limit"]
 story_points: 5
-sprint: null
-start_date: null
-due_date: null
+sprint: 1
+start_date: "2026-01-18"
+due_date: "2026-01-20"
 time_estimate: "2d"
 clickup_task_id: null
 ---
@@ -24,13 +24,21 @@ clickup_task_id: null
 
 ## Acceptance Criteria
 
-- [ ] CORS middleware thêm headers vào response
-- [ ] CORS xử lý preflight OPTIONS requests
-- [ ] Logger middleware log: method, path, remote_addr, status_code, duration
-- [ ] Rate limiter sử dụng token bucket algorithm
-- [ ] Rate limiter trả về 429 khi vượt quá limit (100 req/min mặc định)
-- [ ] Rate limiter configurable per-service hoặc globally
-- [ ] Middleware chain order: CORS → Logger → RateLimiter → Auth → Proxy
+- [x] CORS middleware thêm headers vào response
+- [x] CORS xử lý preflight OPTIONS requests
+- [x] Logger middleware log: method, path, remote_addr, status_code, duration
+- [x] Rate limiter sử dụng token bucket algorithm
+- [x] Rate limiter trả về 429 khi vượt quá limit (100 req/min mặc định)
+- [x] Rate limiter configurable per-service hoặc globally
+- [x] Middleware chain order: CORS → Logger → RateLimiter → Auth → Proxy
+
+## Implementation Notes
+
+> **✅ DONE** - Đã implement trong:
+> - `mtsgn-aps-be-common-svc/common/middleware/cors.go` - CORS với unit tests
+> - `mtsgn-aps-be-common-svc/common/middleware/ratelimit.go` - Rate limiting với tests
+> - `mtsgn-system-gateway-svc/internal/middleware/` - Logger, CORS, Metrics
+> - `mtsgn-system-gateway-svc/pkg/redis/silding_window_rds.go` - Redis-based rate limit
 
 ## Technical Notes
 

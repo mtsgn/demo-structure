@@ -2,14 +2,14 @@
 id: "STORY-1.3"
 epic_id: "EPIC-001"
 title: "JWT Authentication Service"
-status: "to-do"
+status: "done"
 priority: "critical"
 assigned_to: null
 tags: ["backend", "auth", "jwt", "security"]
 story_points: 8
-sprint: null
-start_date: null
-due_date: null
+sprint: 1
+start_date: "2026-01-21"
+due_date: "2026-01-24"
 time_estimate: "3d"
 clickup_task_id: null
 ---
@@ -24,14 +24,22 @@ clickup_task_id: null
 
 ## Acceptance Criteria
 
-- [ ] User có thể đăng ký với email, password, role
-- [ ] Password được hash bằng bcrypt với cost 10
-- [ ] User có thể đăng nhập và nhận JWT token
-- [ ] JWT token có expiry 24h
-- [ ] Token chứa claims: user_id, email, role
-- [ ] JWT signing sử dụng HMAC-SHA256
-- [ ] User có thể refresh token
+- [x] User có thể đăng ký với email, password, role
+- [x] Password được hash bằng bcrypt với cost 10
+- [x] User có thể đăng nhập và nhận JWT token
+- [x] JWT token có expiry 24h
+- [x] Token chứa claims: user_id, email, role
+- [x] JWT signing sử dụng HMAC-SHA256 (PASETO alternative implemented)
+- [x] User có thể refresh token
 - [ ] Validation email được gửi (optional cho MVP)
+
+## Implementation Notes
+
+> **✅ DONE** - Đã implement trong:
+> - `mtsgn-aps-be-common-svc/common/token/paseto.go` - PASETO token (more secure than JWT)
+> - `mtsgn-aps-be-common-svc/common/token/paseto_test.go` - Unit tests
+> - `mtsgn-system-gateway-svc/internal/handlers/auth.go` - Auth handler
+> - `mtsgn-system-gateway-svc/pkg/config/model.go` - AuthConfig với token expiration
 
 ## Technical Notes
 

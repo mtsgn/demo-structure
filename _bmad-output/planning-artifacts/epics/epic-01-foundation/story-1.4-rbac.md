@@ -2,14 +2,14 @@
 id: "STORY-1.4"
 epic_id: "EPIC-001"
 title: "Role-Based Authorization Middleware"
-status: "to-do"
+status: "done"
 priority: "critical"
 assigned_to: null
 tags: ["backend", "auth", "rbac", "middleware"]
 story_points: 3
-sprint: null
-start_date: null
-due_date: null
+sprint: 1
+start_date: "2026-01-25"
+due_date: "2026-01-26"
 time_estimate: "1d"
 clickup_task_id: null
 ---
@@ -24,12 +24,20 @@ clickup_task_id: null
 
 ## Acceptance Criteria
 
-- [ ] Request có valid JWT với role "advertiser" được access `/api/v1/campaigns/*`
-- [ ] Request có valid JWT với role "supplier" bị reject khi access `/api/v1/admin/*` (403)
-- [ ] Request không có JWT bị reject với 401 Unauthorized
-- [ ] Request có expired JWT bị reject với 401
-- [ ] Request có invalid JWT bị reject với 401
-- [ ] User context được extract và forward to downstream services
+- [x] Request có valid JWT với role "advertiser" được access `/api/v1/campaigns/*`
+- [x] Request có valid JWT với role "supplier" bị reject khi access `/api/v1/admin/*` (403)
+- [x] Request không có JWT bị reject với 401 Unauthorized
+- [x] Request có expired JWT bị reject với 401
+- [x] Request có invalid JWT bị reject với 401
+- [x] User context được extract và forward to downstream services
+
+## Implementation Notes
+
+> **✅ DONE** - Đã implement trong:
+> - `mtsgn-system-gateway-svc/internal/handlers/auth.go` - Auth validation
+> - `mtsgn-system-gateway-svc/internal/server/server.go` - Priority Router với SkipAuth config
+> - `mtsgn-source-base-svc/internal/presentation/middlewares/auth.go` - Auth middleware
+> - `mtsgn-system-gateway-svc/pkg/config/model.go` - ServiceConfig.SkipAuth
 
 ## Technical Notes
 
